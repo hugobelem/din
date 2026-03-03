@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from .entity import Transaction
+from ..core.entity import Transaction
 from .model import TransactionModel
 from .repository import TransactionRepository
-from .mappers import to_model, to_entity
+from ..utils.mappers import to_model, to_entity
 
 
 class AlchemyTransactionRepository(TransactionRepository):

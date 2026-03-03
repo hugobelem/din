@@ -1,5 +1,5 @@
-from .entity import Transaction
-from .model import TransactionModel
+from ..core.entity import Transaction
+from ..infra.model import TransactionModel
 
 
 def to_model(tx: Transaction) -> TransactionModel:

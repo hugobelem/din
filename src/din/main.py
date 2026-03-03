@@ -1,4 +1,4 @@
-from din.api.cli import app
+from din.interface.cli import app
 from din.infra.db import init_db
 
 def main() -> None:

@@ -1,6 +1,6 @@
 from datetime import date
-from .entity import Transaction
-from .repository import TransactionRepository
+from ..core.entity import Transaction
+from ..infra.repository import TransactionRepository
 
 
 class AddTransaction:

@@ -1,7 +1,7 @@
 import typer
 from din.infra.db import SessionLocal
-from din.transactions.use import AddTransaction
-from din.transactions.alchemy import AlchemyTransactionRepository
+from din.transactions.app.use import AddTransaction
+from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
 
 app = typer.Typer()
@@ -15,8 +15,8 @@ def add(description: str, amount: float, category: str, type: str):
 
 @app.command()
 def list():
-    from din.transactions.use import ListTransactions
-    from din.transactions.alchemy import AlchemyTransactionRepository
+    from din.transactions.app.use import ListTransactions
+    from din.transactions.infra.alchemy import AlchemyTransactionRepository
     from din.infra.db import SessionLocal
 
 
