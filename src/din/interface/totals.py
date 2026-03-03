@@ -5,6 +5,7 @@ from din.transactions.infra.alchemy import AlchemyTransactionRepository
 balance = typer.Typer(invoke_without_command=True)
 income = typer.Typer(invoke_without_command=True)
 expense = typer.Typer(invoke_without_command=True)
+total = typer.Typer(invoke_without_command=True)
 
 @balance.callback()
 def get_tota_balance(ctx: typer.Context):
@@ -44,3 +45,16 @@ def get_total_expense(ctx: typer.Context):
         use = GetTotalExpense(repo)
 
         print(f'expense: {use.execute() / 100:.2f}')
+
+@total.callback()
+def get_total(ctx: typer.Context):
+    if ctx.invoked_subcommand is not None:
+        return
+    
+    from din.transactions.app.use import GetTotal
+
+    with SessionLocal() as session:
+        repo = AlchemyTransactionRepository(session)
+        use = GetTotal(repo)
+
+        print(f'total: {use.execute() / 100:.2f}')

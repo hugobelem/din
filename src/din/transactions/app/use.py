@@ -71,6 +71,16 @@ class DeleteTransaction:
 
     def execute(self, id: str) -> None:
         return self.repo.delete(id)
+    
+
+class GetTotal:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self) -> int:
+        ts = self.repo.all()
+
+        return sum([t.amount for t in ts])
 
 
 class GetTotalBalance:
