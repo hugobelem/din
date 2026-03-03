@@ -1,4 +1,5 @@
 import typer
+from typing import Literal
 from din.infra.db import SessionLocal
 from din.transactions.app.use import AddTransaction
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
@@ -7,7 +8,7 @@ from din.transactions.infra.alchemy import AlchemyTransactionRepository
 app = typer.Typer()
 
 @app.command()
-def add(description: str, amount: float, category: str, type: str):
+def add(type: Literal[1, 2 ,3], description: str, amount: int, category: str):
     with SessionLocal() as session:
         repo = AlchemyTransactionRepository(session)
         use = AddTransaction(repo)
@@ -26,8 +27,8 @@ def list():
 
         transactions = use.execute()
 
-        for t in transactions:
+        for i, t in enumerate(transactions):
             print(
-                f"{t.id} | {t.date} | {t.type} | "
-                f"{t.category} | {t.amount} | {t.description}"
+                f"{i + 1}. {t.id} | {t.date.date()} | [ {t.type} ] | "
+                f"{t.category:12} | {t.amount / 100:<8.2f} | {t.description}"
             )

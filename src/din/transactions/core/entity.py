@@ -1,12 +1,13 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import datetime
 
+from typing import Literal
 
 @dataclass
 class Transaction:
-    id: str
+    id: str | None
     description: str
-    amount: float
+    amount: int
     category: str
-    date: date
-    type: str
+    date: datetime
+    type: Literal[1, 2, 3]
