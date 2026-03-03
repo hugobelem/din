@@ -5,17 +5,22 @@ from din.transactions.utils import formatter
 from din.transactions.app.dto import TransactionUpdate
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
-
 transaction = typer.Typer(no_args_is_help=True)
 
 @transaction.command()
-def add(type: Literal[1, 2 ,3], description: str, amount: int, category: str):
+def add(
+    type: Literal[1, 2 ,3],
+    category: str,
+    amount: int,
+    description: str,
+    due: str | None = None,
+):
     from din.transactions.app.use import AddTransaction
 
     with SessionLocal() as session:
         repo = AlchemyTransactionRepository(session)
         use = AddTransaction(repo)
-        use.execute(description, amount, category, type)
+        use.execute(type, due, description, amount, category)
 
 @transaction.command()
 def all():
@@ -26,6 +31,7 @@ def all():
         use = ListTransactions(repo)
 
         transactions = use.execute()
+        transactions.sort(key=lambda t: t.due)
 
         formatter.multiple(transactions)
 
@@ -48,13 +54,14 @@ def get(id: str):
 def update(
     id: str,
     amount: int | None = None,
+    due: str | None = None,
     category: str | None = None,
     description: str | None = None,
     type: int | None = None,
 ):
     from din.transactions.app.use import UpdateTransaction
 
-    if type not in [1, 2, 3]:
+    if type and type not in [1, 2, 3]:
         print('Type must be 1 (income), 2 (expense), or 3 (transfer)')
         return
 
@@ -63,6 +70,7 @@ def update(
         use = UpdateTransaction(repo)
 
         fields = TransactionUpdate(
+            due=due,
             amount=amount,
             category=category,
             description=description,
@@ -86,3 +94,13 @@ def delete(id: str):
         use = DeleteTransaction(repo)
 
         use.execute(id)
+
+@transaction.command()
+def balance():
+    from din.transactions.app.use import GetTotalBalance
+
+    with SessionLocal() as session:
+        repo = AlchemyTransactionRepository(session)
+        use = GetTotalBalance(repo)
+
+        print(f'balance: {use.execute() / 100:.2f}')

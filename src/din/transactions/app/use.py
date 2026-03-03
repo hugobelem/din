@@ -1,6 +1,6 @@
 from typing import Literal
 from zoneinfo import ZoneInfo
-from datetime import datetime
+from datetime import datetime, date
 from .dto import TransactionUpdate
 from ..core.entity import Transaction
 from ..core.repository import TransactionRepository
@@ -12,18 +12,28 @@ class AddTransaction:
 
     def execute(
             self,
+            type: Literal[1, 2, 3],
+            due: str | None,
             description: str,
             amount: int,
             category: str,
-            type: Literal[1, 2, 3]
         ) -> None:
+
+        due_date = date.today()
+        if due:
+            due_date = date.strptime(due, '%Y-%m-%d')
+
+        if type == 2:
+            amount = -abs(amount)
+
         model = Transaction(
             id=None,
+            created=datetime.now(ZoneInfo('America/Recife')),
+            type=type,
+            due=due_date,
             description=description,
             amount=amount,
             category=category,
-            date=datetime.now(ZoneInfo('America/Recife')),
-            type=type
         )
         self.repo.add(model)
 
@@ -49,6 +59,9 @@ class UpdateTransaction:
         self.repo = repo
 
     def execute(self, id: str, fields: TransactionUpdate) -> Transaction | None:
+        if fields.due:
+            setattr(fields, 'due', date.strptime(fields.due, '%Y-%m-%d'))
+
         return self.repo.update(id, fields)
 
 
@@ -58,3 +71,16 @@ class DeleteTransaction:
 
     def execute(self, id: str) -> None:
         return self.repo.delete(id)
+
+
+class GetTotalBalance:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self) -> int:
+        transactions = self.repo.all()
+
+        today = date.today()
+        up_to_today = [t for t in transactions if t.due <= today]
+
+        return sum([transaction.amount for transaction in up_to_today])

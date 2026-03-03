@@ -9,12 +9,12 @@ def single(
 
     if category_width is None and amount_width is None:
         return (
-            f"{t.id} | {t.date.date()} | [ {t.type} ] | "
+            f"{t.id} | {t.due} | [ {t.type} ] | "
             f"{t.category} | {amount} | {t.description}"
         )
 
     return (
-        f"{t.id} | {t.date.date()} | [ {t.type} ] | "
+        f"{t.id} | {t.due} | [ {t.type} ] | "
         f"{t.category:<{category_width}} | "
         f"{amount:>{amount_width}} | "
         f"{t.description}"

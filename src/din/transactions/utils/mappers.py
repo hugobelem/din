@@ -7,21 +7,23 @@ from ..infra.model import TransactionModel
 
 def to_model(tx: Transaction) -> TransactionModel:
     return TransactionModel(
+        created=tx.created,
+        type=tx.type,
+        due=tx.due,
         description=tx.description,
         amount=tx.amount,
         category=tx.category,
-        date=tx.date,
-        type=tx.type,
     )
 
 def to_entity(model: TransactionModel) -> Transaction:
     return Transaction(
         id=model.id,
+        created=model.created,
+        type=model.type,
+        due=model.due,
         description=model.description,
         amount=model.amount,
         category=model.category,
-        date=model.date,
-        type=model.type,
     )
 
 def to_dict(obj: TransactionUpdate) -> dict[str, Any]:

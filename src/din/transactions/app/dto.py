@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional
 
 @dataclass
 class TransactionUpdate:
-    amount: Optional[int] = None
-    category: Optional[str] = None
-    description: Optional[str] = None
-    type: Optional[int] = None
+    type: int | None = None
+    due: str | None = None
+    description: str | None = None
+    amount: int | None = None
+    category: str | None = None
