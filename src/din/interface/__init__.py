@@ -1,4 +1,4 @@
 from .transactions import transaction
-from .balance import balance
+from .totals import balance, income, expense
 
-APPS = [transaction, balance]
+APPS = [transaction, balance, income, expense]

@@ -78,9 +78,27 @@ class GetTotalBalance:
         self.repo = repo
 
     def execute(self) -> int:
-        transactions = self.repo.all()
+        ts = self.repo.all()
 
         today = date.today()
-        up_to_today = [t for t in transactions if t.due <= today]
+        up_to_today = [t for t in ts if t.due <= today]
 
-        return sum([transaction.amount for transaction in up_to_today])
+        return sum([t.amount for t in up_to_today])
+
+class GetTotalIncome:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self) -> int:
+        ts = self.repo.all()
+
+        return sum([t.amount for t in ts if t.type == 1])
+    
+class GetTotalExpense:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self) -> int:
+        ts = self.repo.all()
+
+        return sum([t.amount for t in ts if t.type == 2])
