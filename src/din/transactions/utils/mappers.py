@@ -1,4 +1,7 @@
+from typing import Any
+from dataclasses import asdict
 from ..core.entity import Transaction
+from ..app.dto import TransactionUpdate
 from ..infra.model import TransactionModel
 
 
@@ -20,3 +23,6 @@ def to_entity(model: TransactionModel) -> Transaction:
         date=model.date,
         type=model.type,
     )
+
+def to_dict(obj: TransactionUpdate) -> dict[str, Any]:
+    return {k: v for k, v in asdict(obj).items() if v is not None}

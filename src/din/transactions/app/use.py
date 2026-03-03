@@ -1,8 +1,9 @@
 from typing import Literal
-from datetime import datetime
 from zoneinfo import ZoneInfo
+from datetime import datetime
+from .dto import TransactionUpdate
 from ..core.entity import Transaction
-from ..infra.repository import TransactionRepository
+from ..core.repository import TransactionRepository
 
 
 class AddTransaction:
@@ -15,7 +16,7 @@ class AddTransaction:
             amount: int,
             category: str,
             type: Literal[1, 2, 3]
-        ):
+        ) -> None:
         model = Transaction(
             id=None,
             description=description,
@@ -32,4 +33,28 @@ class ListTransactions:
         self.repo = repo
 
     def execute(self) -> list[Transaction]:
-        return self.repo.list()
+        return self.repo.all()
+    
+
+class GetTransaction:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self, id: str) -> Transaction | None:
+        return self.repo.get(id)
+    
+
+class UpdateTransaction:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self, id: str, fields: TransactionUpdate) -> Transaction | None:
+        return self.repo.update(id, fields)
+
+
+class DeleteTransaction:
+    def __init__(self, repo: TransactionRepository) -> None:
+        self.repo = repo
+
+    def execute(self, id: str) -> None:
+        return self.repo.delete(id)
