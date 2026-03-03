@@ -1,0 +1,20 @@
+[project]
+name = "din"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Hugo Belém", email = "belem.hugo@hotmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "sqlalchemy>=2.0.48",
+    "typer>=0.24.1",
+]
+
+[project.scripts]
+din = "din:main"
+
+[build-system]
+requires = ["uv_build>=0.10.4,<0.11.0"]
+build-backend = "uv_build"
