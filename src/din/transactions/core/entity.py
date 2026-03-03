@@ -4,7 +4,7 @@ from datetime import date
 
 @dataclass
 class Transaction:
-    id: int
+    id: str
     description: str
     amount: float
     category: str
