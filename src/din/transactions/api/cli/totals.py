@@ -8,7 +8,7 @@ expense_app = typer.Typer(invoke_without_command=True)
 total_app = typer.Typer(invoke_without_command=True)
 
 @balance_app.callback()
-def get_tota_balance(ctx: typer.Context):
+def get_current_balance(ctx: typer.Context):
     if ctx.invoked_subcommand is not None:
         return
     
