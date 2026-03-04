@@ -1,32 +1,31 @@
-from zoneinfo import ZoneInfo
-from datetime import datetime, date
+from datetime import date
 from din.transactions.core.entity import Transaction, TransactionType
 from din.transactions.core.repository import TransactionRepository
+from din.shared.core.clock import Clock
 from .dto import TransactionUpdate
 
 
 class AddTransaction:
-    def __init__(self, repo: TransactionRepository) -> None:
+    def __init__(self, repo: TransactionRepository, clock: Clock) -> None:
         self._repo = repo
+        self._clock = clock
 
     def execute(
             self,
             type: TransactionType,
-            due: str | None,
+            due: date | None,
             description: str,
             amount: int,
             category: str,
         ) -> None:
 
-        due_date = date.today()
-        if due:
-            due_date = date.strptime(due, '%Y-%m-%d')
+        due_date = due or date.today()
 
         if type == TransactionType.EXPENSE:
             amount = -abs(amount)
 
         model = Transaction(
-            created=datetime.now(ZoneInfo('America/Recife')),
+            created=self._clock.now(),
             type=type,
             due=due_date,
             description=description,
@@ -57,6 +56,13 @@ class UpdateTransaction:
         self._repo = repo
 
     def execute(self, id: str, fields: TransactionUpdate) -> Transaction | None:
+        transaction = self._repo.get(id)
+        if not transaction:
+            return
+        
+        if fields.amount is not None and transaction.type == TransactionType.EXPENSE:
+            fields.amount = -abs(fields.amount)
+    
         return self._repo.update(id, fields)
 
 

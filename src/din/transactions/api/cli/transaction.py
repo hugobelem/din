@@ -1,26 +1,35 @@
 import typer
+from datetime import datetime
 from din.shared.infra.db import SessionLocal
+from din.shared.infra.clock import SystemClock
 from din.transactions.api import formatter
 from din.transactions.app.dto import TransactionUpdate
-from din.transactions.core.entity import TransactionType
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
 transaction_app = typer.Typer(no_args_is_help=True)
 
 @transaction_app.command()
 def add(
-    type: TransactionType,
+    type: str,
     category: str,
     amount: int,
     description: str,
     due: str | None = None,
 ):
     from din.transactions.app.use import AddTransaction
+    from din.transactions.core.entity import TransactionType
 
+    parsed_type = TransactionType[type.upper()]
+
+    parsed_due = None
+    if due:
+        parsed_due = datetime.strptime(due, "%Y-%m-%d").date()
+        
     with SessionLocal() as session:
         repo = AlchemyTransactionRepository(session)
-        use = AddTransaction(repo)
-        use.execute(type, due, description, amount, category)
+        clock = SystemClock()
+        use = AddTransaction(repo, clock)
+        use.execute(parsed_type, parsed_due, description, amount, category)
 
 @transaction_app.command()
 def all():
@@ -57,24 +66,29 @@ def update(
     due: str | None = None,
     category: str | None = None,
     description: str | None = None,
-    type: int | None = None,
+    type: str | None = None,
 ):
     from din.transactions.app.use import UpdateTransaction
+    from din.transactions.core.entity import TransactionType
 
-    if type and type not in [1, 2, 3]:
-        print('Type must be 1 (income), 2 (expense), or 3 (transfer)')
-        return
+    parsed_type = None
+    if type:
+        parsed_type = TransactionType[type.upper()]
+
+    parsed_due = None
+    if due:
+        parsed_due = datetime.strptime(due, "%Y-%m-%d").date()
 
     with SessionLocal() as session:
         repo = AlchemyTransactionRepository(session)
         use = UpdateTransaction(repo)
 
         fields = TransactionUpdate(
-            due=due,
+            due=parsed_due,
             amount=amount,
             category=category,
             description=description,
-            type=type
+            type=parsed_type
         )
 
         transaction = use.execute(id, fields)
