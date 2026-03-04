@@ -108,13 +108,3 @@ def delete(id: str):
         use = DeleteTransaction(repo)
 
         use.execute(id)
-
-@transaction_app.command()
-def balance():
-    from din.transactions.app.use import GetTotalBalance
-
-    with SessionLocal() as session:
-        repo = AlchemyTransactionRepository(session)
-        use = GetTotalBalance(repo)
-
-        print(f'balance: {use.execute() / 100:.2f}')
