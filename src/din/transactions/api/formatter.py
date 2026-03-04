@@ -61,8 +61,16 @@ def multiple(transactions: list[Transaction]):
 
     for month, transactions in reversed(group_by_month.items()):
         print(f'{BOLD}{month}{RESET}')
-        month_balance = 0
+        balance = 0
+        income = 0
+        expense = 0
         for i, t in enumerate(transactions):
+            balance += t.amount
+            if t.type == TransactionType.INCOME:
+                income += t.amount
+            if t.type == TransactionType.EXPENSE:
+                expense += t.amount
+        
             today = date.today()
             color = BLACK
             if t.due > today:
@@ -78,12 +86,18 @@ def multiple(transactions: list[Transaction]):
                 amount_width=amount_width,
             )
             print(f'{color}{i + 1:3}. {line}{RESET}')
-            month_balance += t.amount
 
-        if month_balance > 0:
-            balance_color = GREEN
+
+        if balance > 0:
+            color = GREEN
         else:
-            balance_color = RED
+            color = RED
 
-        print(f'balance: {balance_color}{month_balance / 100:.2f}{RESET}')
+        print(f'{'-'*100}')
+        print(
+            'forecast // '
+            f'income: {income / 100:.2f} // '
+            f'expense: {expense / 100:.2f} // '
+            f'balance: {color}{balance / 100:.2f}{RESET}'
+        )
         print('')
