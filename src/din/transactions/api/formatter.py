@@ -1,4 +1,5 @@
-from din.transactions.core.entity import Transaction
+from datetime import date
+from din.transactions.core.entity import Transaction, TransactionType
 
 
 BLACK = "\033[30m"
@@ -7,8 +8,14 @@ RED = "\033[31m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
 BLUE = "\033[34m"
-BOLD = "\033[1m"
+
 RESET = "\033[0m"
+BOLD = "\033[1m"
+DIM = "\033[2m"
+ITALIC = "\033[3m"
+UNDERLINE = "\033[4m"
+REVERSE = "\033[7m"
+STRIKE = "\033[9m"
 
 def single(
     t: Transaction,
@@ -56,12 +63,21 @@ def multiple(transactions: list[Transaction]):
         print(f'{BOLD}{month}{RESET}')
         month_balance = 0
         for i, t in enumerate(transactions):
+            today = date.today()
+            color = BLACK
+            if t.due > today:
+                color = DIM
+            if t.due == today:
+                color = BOLD
+            if t.type == TransactionType.INCOME:
+                color += ITALIC
+
             line = single(
                 t,
                 category_width=category_width,
                 amount_width=amount_width,
             )
-            print(f'{i + 1:3}. {line}')
+            print(f'{color}{i + 1:3}. {line}{RESET}')
             month_balance += t.amount
 
         if month_balance > 0:
@@ -69,5 +85,5 @@ def multiple(transactions: list[Transaction]):
         else:
             balance_color = RED
 
-        print(f'{balance_color}balance: {month_balance / 100:.2f}{RESET}')
+        print(f'balance: {balance_color}{month_balance / 100:.2f}{RESET}')
         print('')
