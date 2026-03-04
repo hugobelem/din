@@ -1,15 +1,15 @@
 import typer
-from typing import Literal
 from din.infra.db import SessionLocal
 from din.transactions.utils import formatter
 from din.transactions.app.dto import TransactionUpdate
+from din.transactions.core.entity import TransactionType
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
 transaction_app = typer.Typer(no_args_is_help=True)
 
 @transaction_app.command()
 def add(
-    type: Literal[1, 2 ,3],
+    type: TransactionType,
     category: str,
     amount: int,
     description: str,

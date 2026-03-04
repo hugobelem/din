@@ -1,9 +1,9 @@
 import ulid
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, Integer, DateTime, Date
+from sqlalchemy import String, Integer, DateTime, Date, Enum as SAEnum
 from din.infra.db import Base
 from datetime import datetime, date
-from typing import Literal
+from ..core.entity import TransactionType
 
 ulid = ulid.new().str
 
@@ -13,7 +13,15 @@ class TransactionModel(Base):
 
     id: Mapped[str] = mapped_column(primary_key=True, nullable=False, default=ulid)
     created: Mapped[datetime] = mapped_column(DateTime, index=True)
-    type: Mapped[Literal[1, 2, 3]] = mapped_column(Integer, index=True)
+    type: Mapped[TransactionType] = mapped_column(
+        SAEnum(
+            TransactionType,
+            name='transaction_type',
+            native_enum=False,
+        ),
+        nullable=False,
+        index=True,
+    )
     due: Mapped[date] = mapped_column(Date, index=True)
     description: Mapped[str] = mapped_column(String, index=True)
     amount: Mapped[int] = mapped_column(Integer, index=True)

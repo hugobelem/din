@@ -1,8 +1,7 @@
-from typing import Literal
 from zoneinfo import ZoneInfo
 from datetime import datetime, date
 from .dto import TransactionUpdate
-from ..core.entity import Transaction
+from ..core.entity import Transaction, TransactionType
 from ..core.repository import TransactionRepository
 
 
@@ -12,7 +11,7 @@ class AddTransaction:
 
     def execute(
             self,
-            type: Literal[1, 2, 3],
+            type: TransactionType,
             due: str | None,
             description: str,
             amount: int,
@@ -23,7 +22,7 @@ class AddTransaction:
         if due:
             due_date = date.strptime(due, '%Y-%m-%d')
 
-        if type == 2:
+        if type == TransactionType.EXPENSE:
             amount = -abs(amount)
 
         model = Transaction(
@@ -99,7 +98,7 @@ class GetTotalIncome:
     def execute(self) -> int:
         ts = self._repo.all()
 
-        return sum([t.amount for t in ts if t.type == 1])
+        return sum([t.amount for t in ts if t.type == TransactionType.INCOME])
     
 class GetTotalExpense:
     def __init__(self, repo: TransactionRepository) -> None:
@@ -108,4 +107,4 @@ class GetTotalExpense:
     def execute(self) -> int:
         ts = self._repo.all()
 
-        return sum([t.amount for t in ts if t.type == 2])
+        return sum([t.amount for t in ts if t.type == TransactionType.EXPENSE])

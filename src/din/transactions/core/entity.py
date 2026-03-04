@@ -1,13 +1,19 @@
 from dataclasses import dataclass
 from datetime import datetime, date
+from enum import Enum
 
-from typing import Literal
+
+class TransactionType(Enum):
+    INCOME = 'income'
+    EXPENSE = 'expense'
+    TRANSFER = 'transfer'
+
 
 @dataclass
 class Transaction:
     id: str | None
     created: datetime
-    type: Literal[1, 2, 3]
+    type: TransactionType
     due: date
     description: str
     amount: int
