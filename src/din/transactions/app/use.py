@@ -8,7 +8,7 @@ from ..core.repository import TransactionRepository
 
 class AddTransaction:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(
             self,
@@ -35,60 +35,60 @@ class AddTransaction:
             amount=amount,
             category=category,
         )
-        self.repo.add(model)
+        self._repo.add(model)
 
 
 class ListTransactions:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self) -> list[Transaction]:
-        return self.repo.all()
+        return self._repo.all()
     
 
 class GetTransaction:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self, id: str) -> Transaction | None:
-        return self.repo.get(id)
+        return self._repo.get(id)
     
 
 class UpdateTransaction:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self, id: str, fields: TransactionUpdate) -> Transaction | None:
         if fields.due:
             setattr(fields, 'due', date.strptime(fields.due, '%Y-%m-%d'))
 
-        return self.repo.update(id, fields)
+        return self._repo.update(id, fields)
 
 
 class DeleteTransaction:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self, id: str) -> None:
-        return self.repo.delete(id)
+        return self._repo.delete(id)
     
 
 class GetTotal:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self) -> int:
-        ts = self.repo.all()
+        ts = self._repo.all()
 
         return sum([t.amount for t in ts])
 
 
 class GetTotalBalance:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self) -> int:
-        ts = self.repo.all()
+        ts = self._repo.all()
 
         today = date.today()
         up_to_today = [t for t in ts if t.due <= today]
@@ -97,18 +97,18 @@ class GetTotalBalance:
 
 class GetTotalIncome:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self) -> int:
-        ts = self.repo.all()
+        ts = self._repo.all()
 
         return sum([t.amount for t in ts if t.type == 1])
     
 class GetTotalExpense:
     def __init__(self, repo: TransactionRepository) -> None:
-        self.repo = repo
+        self._repo = repo
 
     def execute(self) -> int:
-        ts = self.repo.all()
+        ts = self._repo.all()
 
         return sum([t.amount for t in ts if t.type == 2])
