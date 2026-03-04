@@ -7,6 +7,7 @@ from .model import TransactionModel
 
 def to_model(tx: Transaction) -> TransactionModel:
     return TransactionModel(
+        id=tx.id,
         created=tx.created,
         type=tx.type,
         due=tx.due,

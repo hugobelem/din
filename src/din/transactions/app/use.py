@@ -26,7 +26,6 @@ class AddTransaction:
             amount = -abs(amount)
 
         model = Transaction(
-            id=None,
             created=datetime.now(ZoneInfo('America/Recife')),
             type=type,
             due=due_date,
