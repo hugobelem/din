@@ -59,9 +59,6 @@ class UpdateTransaction:
         self._repo = repo
 
     def execute(self, id: str, fields: TransactionUpdate) -> Transaction | None:
-        if fields.due:
-            setattr(fields, 'due', date.strptime(fields.due, '%Y-%m-%d'))
-
         return self._repo.update(id, fields)
 
 
