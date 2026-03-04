@@ -22,7 +22,7 @@ def single(
     category_width: int | None = None,
     amount_width: int | None = None,
 ):      
-    amount = f'{t.amount / 100:.2f}'
+    amount = f'{t.amount / 100:,.2f}'
 
     if category_width is None and amount_width is None:
         return (
@@ -42,7 +42,7 @@ def multiple(transactions: list[Transaction]):
     if not transactions:
         return
 
-    formatted_amounts = [f'{t.amount / 100:.2f}' for t in transactions]
+    formatted_amounts = [f'{t.amount / 100:,.2f}' for t in transactions]
     amount_width = max(len(a) for a in formatted_amounts)
     category_width = max(len(t.category) for t in transactions)
 
@@ -61,16 +61,24 @@ def multiple(transactions: list[Transaction]):
 
     for month, transactions in reversed(group_by_month.items()):
         print(f'{BOLD}{month}{RESET}')
-        balance = 0
-        income = 0
-        expense = 0
+        total_balance = 0
+        total_income = 0
+        total_expense = 0
+        forcasted_income = 0
+        forcasted_expense = 0
         for i, t in enumerate(transactions):
-            balance += t.amount
+            total_balance += t.amount
             if t.type == TransactionType.INCOME:
-                income += t.amount
+                total_income += t.amount
             if t.type == TransactionType.EXPENSE:
-                expense += t.amount
-        
+                total_expense += t.amount
+
+            if t.due > date.today():
+                if t.type == TransactionType.INCOME:
+                    forcasted_income += t.amount
+                if t.type == TransactionType.EXPENSE:
+                    forcasted_expense += t.amount
+                    
             today = date.today()
             color = BLACK
             if t.due > today:
@@ -88,7 +96,7 @@ def multiple(transactions: list[Transaction]):
             print(f'{color}{i + 1:3}. {line}{RESET}')
 
 
-        if balance > 0:
+        if total_balance > 0:
             color = GREEN
         else:
             color = RED
@@ -96,8 +104,13 @@ def multiple(transactions: list[Transaction]):
         print(f'{'-'*100}')
         print(
             'forecast // '
-            f'income: {income / 100:.2f} // '
-            f'expense: {expense / 100:.2f} // '
-            f'balance: {color}{balance / 100:.2f}{RESET}'
+            f'income: {forcasted_income / 100:,.2f} // '
+            f'expense: {forcasted_expense / 100:,.2f}'
+        )
+        print(
+            'totals // '
+            f'income: {total_income / 100:,.2f} // '
+            f'expense: {total_expense / 100:,.2f} // '
+            f'balance: {color}{total_balance / 100:,.2f}{RESET}'
         )
         print('')
