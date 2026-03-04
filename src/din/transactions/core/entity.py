@@ -1,12 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, date
-from enum import Enum
-
-
-class TransactionType(Enum):
-    INCOME = 'income'
-    EXPENSE = 'expense'
-    TRANSFER = 'transfer'
+from .objects import TransactionType
 
 
 @dataclass

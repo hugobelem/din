@@ -1,5 +1,5 @@
 import typer
-from din.infra.db import SessionLocal
+from din.shared.infra.db import SessionLocal
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
 balance_app = typer.Typer(invoke_without_command=True)

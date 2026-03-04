@@ -1,6 +1,6 @@
 import typer
-from din.infra.db import SessionLocal
-from din.transactions.utils import formatter
+from din.shared.infra.db import SessionLocal
+from din.transactions.api import formatter
 from din.transactions.app.dto import TransactionUpdate
 from din.transactions.core.entity import TransactionType
 from din.transactions.infra.alchemy import AlchemyTransactionRepository

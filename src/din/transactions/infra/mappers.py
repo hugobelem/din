@@ -1,8 +1,8 @@
 from typing import Any
 from dataclasses import asdict
-from ..core.entity import Transaction
-from ..app.dto import TransactionUpdate
-from ..infra.model import TransactionModel
+from din.transactions.core.entity import Transaction
+from din.transactions.app.dto import TransactionUpdate
+from .model import TransactionModel
 
 
 def to_model(tx: Transaction) -> TransactionModel:

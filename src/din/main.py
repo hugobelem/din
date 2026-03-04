@@ -1,5 +1,5 @@
 from din.interface.cli import app
-from din.infra.db import init_db
+from din.shared.infra.db import init_db
 
 def main() -> None:
     init_db()

@@ -1,9 +1,9 @@
 import ulid
+from datetime import datetime, date
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, Integer, DateTime, Date, Enum as SAEnum
-from din.infra.db import Base
-from datetime import datetime, date
-from ..core.entity import TransactionType
+from din.shared.infra.db import Base
+from din.transactions.core.entity import TransactionType
 
 ulid = ulid.new().str
 

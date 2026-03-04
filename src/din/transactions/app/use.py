@@ -1,8 +1,8 @@
 from zoneinfo import ZoneInfo
 from datetime import datetime, date
+from din.transactions.core.entity import Transaction, TransactionType
+from din.transactions.core.repository import TransactionRepository
 from .dto import TransactionUpdate
-from ..core.entity import Transaction, TransactionType
-from ..core.repository import TransactionRepository
 
 
 class AddTransaction:

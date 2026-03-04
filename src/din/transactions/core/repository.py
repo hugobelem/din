@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
+from din.transactions.app.dto import TransactionUpdate
 from .entity import Transaction
-from ..app.dto import TransactionUpdate
 
 
 class TransactionRepository(ABC):
