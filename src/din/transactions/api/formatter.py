@@ -80,7 +80,7 @@ def multiple(transactions: list[Transaction]):
                     forcasted_expense += t.amount
                     
             today = date.today()
-            color = BLACK
+            color = RESET
             if t.due > today:
                 color = DIM
             if t.due == today:
