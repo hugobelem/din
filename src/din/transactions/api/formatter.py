@@ -59,7 +59,7 @@ def multiple(transactions: list[Transaction]):
         if month_name in group_by_month.keys():
             group_by_month[month_name].append(t)
 
-    for month, transactions in reversed(group_by_month.items()):
+    for month, transactions in group_by_month.items():
         print(f'{BOLD}{month}{RESET}')
         total_balance = 0
         total_income = 0
