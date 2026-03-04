@@ -5,9 +5,9 @@ from din.transactions.utils import formatter
 from din.transactions.app.dto import TransactionUpdate
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
-transaction = typer.Typer(no_args_is_help=True)
+transaction_app = typer.Typer(no_args_is_help=True)
 
-@transaction.command()
+@transaction_app.command()
 def add(
     type: Literal[1, 2 ,3],
     category: str,
@@ -22,7 +22,7 @@ def add(
         use = AddTransaction(repo)
         use.execute(type, due, description, amount, category)
 
-@transaction.command()
+@transaction_app.command()
 def all():
     from din.transactions.app.use import ListTransactions
 
@@ -35,7 +35,7 @@ def all():
 
         formatter.multiple(transactions)
 
-@transaction.command()
+@transaction_app.command()
 def get(id: str):
     from din.transactions.app.use import GetTransaction
 
@@ -43,14 +43,14 @@ def get(id: str):
         repo = AlchemyTransactionRepository(session)
         use = GetTransaction(repo)
 
-        t = use.execute(id)
+        transaction = use.execute(id)
         
-        if t:
-            print(formatter.single(t))
+        if transaction:
+            print(formatter.single(transaction))
         else:
             print('Not found')
 
-@transaction.command()
+@transaction_app.command()
 def update(
     id: str,
     amount: int | None = None,
@@ -77,15 +77,15 @@ def update(
             type=type
         )
 
-        t = use.execute(id, fields)
+        transaction = use.execute(id, fields)
 
-        if t:
-            print(formatter.single(t))
+        if transaction:
+            print(formatter.single(transaction))
         else:
             print('Not found')
 
 
-@transaction.command()
+@transaction_app.command()
 def delete(id: str):
     from din.transactions.app.use import DeleteTransaction
 
@@ -95,7 +95,7 @@ def delete(id: str):
 
         use.execute(id)
 
-@transaction.command()
+@transaction_app.command()
 def balance():
     from din.transactions.app.use import GetTotalBalance
 

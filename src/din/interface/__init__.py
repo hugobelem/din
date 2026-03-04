@@ -1,4 +1,4 @@
-from .transactions import transaction
-from .totals import balance, income, expense, total
+from .transactions import transaction_app
+from .totals import balance_app, income_app, expense_app, total_app
 
-APPS = [transaction, balance, income, expense, total]
+APPS = [transaction_app, balance_app, income_app, expense_app, total_app]
