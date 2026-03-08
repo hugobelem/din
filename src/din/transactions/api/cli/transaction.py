@@ -2,7 +2,7 @@ import typer
 from datetime import datetime
 from din.shared.infra.db import SessionLocal
 from din.shared.infra.clock import SystemClock
-from din.transactions.api import formatter
+from din.transactions.api.cli import formatter
 from din.transactions.app.dto import TransactionUpdate
 from din.transactions.infra.alchemy import AlchemyTransactionRepository
 
@@ -32,7 +32,7 @@ def add(
         use.execute(parsed_type, parsed_due, description, amount, category)
 
 @transaction_app.command()
-def all():
+def all(year: int | None = 2026, month: int | None = None):
     from din.transactions.app.use import ListTransactions
 
     with SessionLocal() as session:
@@ -42,7 +42,11 @@ def all():
         transactions = use.execute()
         transactions.sort(key=lambda t: t.due)
 
-        formatter.multiple(transactions)
+        year_month = None
+        if year is not None and month is not None:
+            year_month = (year, month)
+
+        formatter.multiple(transactions, year_month)
 
 @transaction_app.command()
 def get(id: str):
