@@ -104,11 +104,12 @@ def update(
 
 
 @transaction_app.command()
-def delete(id: str):
+def delete(ids: list[str]):
     from din.transactions.app.use import DeleteTransaction
 
     with SessionLocal() as session:
         repo = AlchemyTransactionRepository(session)
         use = DeleteTransaction(repo)
 
-        use.execute(id)
+        for id in ids:
+            use.execute(id)
