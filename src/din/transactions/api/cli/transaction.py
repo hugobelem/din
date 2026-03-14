@@ -15,6 +15,7 @@ def add(
     amount: int,
     description: str,
     due: str | None = None,
+    installments: int = 1,
 ):
     from din.transactions.app.use import AddTransaction
     from din.transactions.core.entity import TransactionType
@@ -29,7 +30,14 @@ def add(
         repo = AlchemyTransactionRepository(session)
         clock = SystemClock()
         use = AddTransaction(repo, clock)
-        use.execute(parsed_type, parsed_due, description, amount, category)
+        use.execute(
+            parsed_type,
+            parsed_due,
+            description,
+            amount,
+            category,
+            installments,
+        )
 
 @transaction_app.command()
 def all(year: int | None = 2026, month: int | None = None):

@@ -1,4 +1,5 @@
 from datetime import date
+from dateutil.relativedelta import relativedelta
 from din.transactions.core.entity import Transaction, TransactionType
 from din.transactions.core.repository import TransactionRepository
 from din.shared.core.clock import Clock
@@ -17,6 +18,7 @@ class AddTransaction:
             description: str,
             amount: int,
             category: str,
+            installments: int = 1,
         ) -> None:
 
         due_date = due or date.today()
@@ -24,15 +26,30 @@ class AddTransaction:
         if type == TransactionType.EXPENSE:
             amount = -abs(amount)
 
-        model = Transaction(
-            created=self._clock.now(),
-            type=type,
-            due=due_date,
-            description=description,
-            amount=amount,
-            category=category,
-        )
-        self._repo.add(model)
+        for i in range(installments):
+            next_month = due_date.month + i
+            next_year = due_date.year
+            
+            if next_month > 12:
+                next_month -= 12
+                next_year += 1
+
+            delta = relativedelta(month=next_month, year=next_year)
+            next_date = due_date + delta
+
+            new_description = description
+            if installments > 1:
+                new_description = f'{description} ({i + 1}/{installments})'
+
+            model = Transaction(
+                created=self._clock.now(),
+                type=type,
+                due=next_date,
+                description=new_description,
+                amount=amount,
+                category=category,
+            )
+            self._repo.add(model)
 
 
 class ListTransactions:
