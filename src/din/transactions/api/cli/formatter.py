@@ -106,7 +106,7 @@ def render_line(
         f"{idx:3}. "
         f"{t.id} | "
         f"{t.due} | "
-        f"[ {t.type.value:7} ] | "
+        f"[ {t.type.value:8} ] | "
         f"{t.category:<{category_width}} | "
         f"{format_amount(t.amount):>{amount_width}} | "
         f"{t.description}"
