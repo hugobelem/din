@@ -23,7 +23,7 @@ class AddTransaction:
 
         due_date = due or date.today()
 
-        if type == TransactionType.EXPENSE:
+        if type == TransactionType.EXPENSE or type == TransactionType.TRANSFER:
             amount = -abs(amount)
 
         for i in range(installments):
