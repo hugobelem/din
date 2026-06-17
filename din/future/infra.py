@@ -38,9 +38,19 @@ class FutureRepository:
         self._session.commit()
 
     def all(self) -> list[f.Future]:
-        rows = self._session.scalars(select(FutureTable)).all()
+        rows = self._session.scalars(select(FutureTable).order_by('due')).all()
 
         return [self._to_model(row) for row in rows]
+    
+    def delete(self, id: str) -> bool:
+        future = self._session.get(FutureTable, UUID(id))
+
+        if not future:
+            return False
+
+        self._session.delete(future)
+        self._session.commit()
+        return True
 
     def _to_model(self, row: FutureTable) -> f.Future:
         return f.Future(

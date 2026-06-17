@@ -72,5 +72,16 @@ def all():
 
     console.print(table)
 
+@future_app.command('del')
+def delete(id: str):
+    with settings.Session() as session:
+        repo = f.FutureRepository(session)
+        is_deleted = repo.delete(id)
+
+    if is_deleted:
+        typer.echo('\nDeleted ;)')
+    else:
+        typer.echo('\nFuture not found :(')
+
 def main():
     app()
