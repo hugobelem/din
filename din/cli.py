@@ -51,12 +51,14 @@ def all():
 
     table = Table(title="Futures", box=box.HORIZONTALS)
 
-    table.add_column('ID')
+    table.add_column("ID")
     table.add_column("Kind")
     table.add_column("Status")
-    table.add_column("Due")
-    table.add_column("Amount", justify="right")
     table.add_column("Contact")
+    table.add_column("Amount", justify="right")
+    table.add_column("Paid", justify="right")
+    table.add_column("Missing", justify="right")
+    table.add_column("Due")
     table.add_column("Category")
 
     for future in futures:
@@ -64,9 +66,11 @@ def all():
             str(future.id),
             future.kind.value,
             future.status.value,
-            str(future.due),
-            str(f'{future.amount / 100 :.2f}'),
             future.contact or '-',
+            str(f'{future.amount / 100 :.2f}'),
+            str(f'{future.paid / 100 :.2f}'),
+            str(f'{(future.amount - future.paid) / 100 :.2f}'),
+            str(future.due),
             future.category or '-',
         )
 
