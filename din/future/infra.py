@@ -24,6 +24,8 @@ class FutureTable(DB_BASE):
     amount: Mapped[int] = mapped_column(Integer)
     paid: Mapped[int] = mapped_column(Integer)
 
+    recurrence: Mapped[f.Recurrence] = mapped_column(Enum(f.Recurrence))
+
     contact: Mapped[str] = mapped_column(String(255))
     category: Mapped[str] = mapped_column(String(255))
     notes: Mapped[str] = mapped_column(String)
@@ -61,6 +63,7 @@ class FutureRepository:
             status=row.status,
             amount=row.amount,
             paid=row.paid,
+            recurrence=row.recurrence,
             contact=row.contact,
             category=row.category,
             notes=row.notes,
@@ -75,6 +78,7 @@ class FutureRepository:
             status=model.status,
             amount=model.amount,
             paid=model.paid,
+            recurrence=model.recurrence,
             contact=model.contact,
             category=model.category,
             notes=model.notes,

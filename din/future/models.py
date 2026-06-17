@@ -15,6 +15,13 @@ class Status(StrEnum):
     PARTIAL = 'partial'
 
 
+class Recurrence(StrEnum):
+    ONCE = 'once'
+    WEEKLY = 'weekly'
+    MONTHLY = 'monthly'
+    INSTALLMENTS = 'installments'
+
+
 @dataclass(slots=True, frozen=True)
 class Future:
     kind: Kind
@@ -23,6 +30,7 @@ class Future:
     status: Status
     amount: int
     paid: int
+    recurrence: Recurrence
     contact: str
     category: str
     notes: str
