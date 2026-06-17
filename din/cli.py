@@ -65,7 +65,7 @@ def all():
             future.kind.value,
             future.status.value,
             str(future.due),
-            str(future.amount),
+            str(f'{future.amount / 100 :.2f}'),
             future.contact or '-',
             future.category or '-',
         )
