@@ -45,9 +45,6 @@ def add(
             notes=notes,
         )
 
-        if future.is_overdue:
-            future.status = f.Status.OVERDUE
-
         if recurrence == f.Recurrence.ONCE:
             repo.save(future)
 
@@ -196,10 +193,16 @@ def all() -> None:
     console.print(table)
 
 @future_app.command()
-def see() -> None:
+def see(
+    month: int | None = None,
+    year: int | None = None,
+    ) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
         futures = repo.all()
+
+        if month:
+            futures = repo.filter(month, year)
 
     table = Table(title='futures', box=box.SIMPLE)
 

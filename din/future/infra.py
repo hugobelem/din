@@ -75,10 +75,11 @@ class FutureRepository:
 
         return [self._to_model(row) for row in rows]
     
-    def filter(self, month: int) -> list[f.Future]:
+    def filter(self, month: int | None, year: int | None) -> list[f.Future]:
         rows = self._session.scalars(select(FutureTable).where(
+            extract('year', FutureTable.due) == year,
             extract('month', FutureTable.due) == month
-        )).all()
+        ).order_by('due')).all()
 
         return [self._to_model(row) for row in rows]
     
