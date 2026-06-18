@@ -182,8 +182,8 @@ def all() -> None:
             future.kind.value,
             future.status.value,
             future.contact or '-',
-            f'{future.amount / 100 :.2f}',
-            f'{future.paid / 100 :.2f}',
+            f'{future.amount / 100 :,.2f}',
+            f'{future.paid / 100 :,.2f}',
             str(future.due),
             future.recurrence.value,
             future.category or '-',
@@ -215,7 +215,13 @@ def see(
     table.add_column('missing', justify='right')
     table.add_column('notes')
 
+    income = 0
+    expenses = 0
+
     for future in futures:
+        income += future.amount if future.kind.value == 'receivable' else 0
+        expenses += future.amount if future.kind.value == 'payable' else 0
+
         status = '■'
         if future.status.value == 'paid':
             status = f'[green]■[/green]'
@@ -229,14 +235,15 @@ def see(
             status,
             future.due.strftime('%d %b %Y'),
             future.contact or '-',
-            f'{future.amount / 100 :.2f}',
-            f'{future.paid / 100 :.2f}',
-            f'{future.outstanding / 100 :.2f}',
+            f'{future.amount / 100 :,.2f}',
+            f'{future.paid / 100 :,.2f}',
+            f'{future.outstanding / 100 :,.2f}',
             future.notes or '-',
             end_section=True
         )
 
     console.print(table)
+    console.print(f'income: {income} expenses: {expenses / 100 :,.2f}')
 
 @future_app.command('del')
 def delete(id: str) -> None:
