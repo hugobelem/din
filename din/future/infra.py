@@ -1,6 +1,6 @@
 from uuid import uuid4, UUID
 
-from sqlalchemy import Date, Integer, String, Enum, select, extract
+from sqlalchemy import Date, Integer, String, Enum, select, extract, update
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session
 
@@ -39,6 +39,37 @@ class FutureRepository:
         self._session.add(self._to_table(future))
         self._session.commit()
 
+    def get(self, id: str) -> f.Future | None:
+        try:
+            uuid = UUID(id)
+        except ValueError:
+            return None
+
+        future = self._session.get(FutureTable, uuid)
+
+        if not future:
+            return None
+
+        return self._to_model(future)
+    
+    def update(self, future: f.Future) -> None:
+        stmt = (
+            update(FutureTable)
+            .where(FutureTable.id == future.id)
+            .values(
+                status=future.status,
+                contact=future.contact,
+                amount=future.amount,
+                paid=future.paid,
+                category=future.category,
+                notes=future.notes,
+                due=future.due,
+            )
+        )
+
+        self._session.execute(stmt)
+        self._session.commit()
+
     def all(self) -> list[f.Future]:
         rows = self._session.scalars(select(FutureTable).order_by('due')).all()
 
@@ -52,12 +83,7 @@ class FutureRepository:
         return [self._to_model(row) for row in rows]
     
     def delete(self, id: str) -> bool:
-        try:
-            uuid = UUID(id)
-        except ValueError:
-            return False
-
-        future = self._session.get(FutureTable, uuid)
+        future = self.get(id)
 
         if not future:
             return False
