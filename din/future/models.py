@@ -39,3 +39,7 @@ class Future:
     @property
     def outstanding(self) -> int:
         return self.amount - self.paid
+    
+    @property
+    def is_overdue(self) -> bool:
+        return self.due < date.today()
