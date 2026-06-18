@@ -45,6 +45,9 @@ def add(
             notes=notes,
         )
 
+        if future.is_overdue:
+            future.status = f.Status.OVERDUE
+
         if recurrence == f.Recurrence.ONCE:
             repo.save(future)
 
@@ -113,23 +116,68 @@ def add(
     typer.echo('\nSaved ;)')
 
 @future_app.command()
-def all():
+def update(
+    id: str,
+    status: f.Status | None = typer.Option(None),
+    contact: str | None = typer.Option(None),
+    amount: int | None = typer.Option(None),
+    paid: int | None = typer.Option(None),
+    category: str | None = typer.Option(None),
+    notes: str | None = typer.Option(None),
+    due: str | None = typer.Option(None),
+    ) -> None:
+    with settings.Session() as session:
+        repo = f.FutureRepository(session)
+        future = repo.get(id)
+        
+        if not future:
+            typer.echo('\nFuture not found :(')
+            return
+        
+        if not any([status, contact, amount, paid, category, notes, due]):
+            typer.echo('Inform a field to be updated.')
+
+        if status is not None:
+            future.status = status
+
+        if contact is not None:
+            future.contact = contact
+
+        if amount is not None:
+            future.amount = amount
+
+        if paid is not None:
+            future.paid = paid
+
+        if due is not None:
+            future.due = date.fromisoformat(due)
+
+        if category is not None:
+            future.category = category
+
+        if notes is not None:
+            future.notes = notes
+
+        repo.update(future)
+
+@future_app.command()
+def all() -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
         futures = repo.all()
 
-    table = Table(title="Futures", box=box.SIMPLE)
+    table = Table(title='Futures', box=box.SIMPLE)
 
-    table.add_column("ID")
-    table.add_column("Kind")
-    table.add_column("Status")
-    table.add_column("Contact")
-    table.add_column("Amount", justify="right")
-    table.add_column("Paid", justify="right")
-    table.add_column("Due")
-    table.add_column("Recurrence")
-    table.add_column("Category")
-    table.add_column("notes")
+    table.add_column('ID')
+    table.add_column('Kind')
+    table.add_column('Status')
+    table.add_column('Contact')
+    table.add_column('Amount', justify='right')
+    table.add_column('Paid', justify='right')
+    table.add_column('Due')
+    table.add_column('Recurrence')
+    table.add_column('Category')
+    table.add_column('notes')
 
     for future in futures:
         table.add_row(
@@ -147,8 +195,48 @@ def all():
 
     console.print(table)
 
+@future_app.command()
+def see() -> None:
+    with settings.Session() as session:
+        repo = f.FutureRepository(session)
+        futures = repo.all()
+
+    table = Table(title='futures', box=box.SIMPLE)
+
+    table.add_column('')
+    table.add_column('', justify='center')
+    table.add_column('due')
+    table.add_column('contact')
+    table.add_column('amount', justify='right')
+    table.add_column('paid', justify='right')
+    table.add_column('missing', justify='right')
+    table.add_column('notes')
+
+    for future in futures:
+        status = '■'
+        if future.status.value == 'paid':
+            status = f'[green]■[/green]'
+        if future.status.value == 'overdue':
+            status = f'[red]■[/red]'
+        if future.status.value == 'partial':
+            status = f'[orange]■[/orange]'
+
+        table.add_row(
+            '-' if future.kind.value == 'payable' else '+',
+            status,
+            future.due.strftime('%d %b %Y'),
+            future.contact or '-',
+            f'{future.amount / 100 :.2f}',
+            f'{future.paid / 100 :.2f}',
+            f'{future.outstanding / 100 :.2f}',
+            future.notes or '-',
+            end_section=True
+        )
+
+    console.print(table)
+
 @future_app.command('del')
-def delete(id: str):
+def delete(id: str) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
         is_deleted = repo.delete(id)
