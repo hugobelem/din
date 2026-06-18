@@ -126,9 +126,10 @@ def all():
     table.add_column("Contact")
     table.add_column("Amount", justify="right")
     table.add_column("Paid", justify="right")
-    table.add_column("Missing", justify="right")
     table.add_column("Due")
+    table.add_column("Recurrence")
     table.add_column("Category")
+    table.add_column("notes")
 
     for future in futures:
         table.add_row(
@@ -138,9 +139,10 @@ def all():
             future.contact or '-',
             str(f'{future.amount / 100 :.2f}'),
             str(f'{future.paid / 100 :.2f}'),
-            str(f'{(future.amount - future.paid) / 100 :.2f}'),
             str(future.due),
+            future.recurrence.value,
             future.category or '-',
+            future.notes or '-'
         )
 
     console.print(table)
