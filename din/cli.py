@@ -16,7 +16,7 @@ console = Console()
 future_app = typer.Typer()
 app.add_typer(future_app, name='future')
 
-@future_app.command('add')
+@future_app.command()
 def add(
     kind: f.Kind = typer.Option('payable', prompt=True),
     issued: str = typer.Option(date.today(), prompt='Issued date (YYYY-MM-DD)'),
