@@ -22,7 +22,7 @@ class Recurrence(StrEnum):
     INSTALLMENTS = 'installments'
 
 
-@dataclass(slots=True, frozen=True)
+@dataclass(slots=True)
 class Future:
     kind: Kind
     issued: date
