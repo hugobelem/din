@@ -6,8 +6,9 @@ from calendar import monthrange
 from din import settings, future as f
 
 from rich import box
-from rich.console import Console
+from rich.console import Console, Group
 from rich.table import Table
+from rich.align import Align
 
 
 app = typer.Typer()
@@ -182,8 +183,8 @@ def all() -> None:
             future.kind.value,
             future.status.value,
             future.contact or '-',
-            f'{future.amount / 100 :,.2f}',
-            f'{future.paid / 100 :,.2f}',
+            _format_money(future.amount),
+            _format_money(future.paid),
             str(future.due),
             future.recurrence.value,
             future.category or '-',
@@ -216,11 +217,15 @@ def see(
     table.add_column('notes')
 
     income = 0
+    paid_income = 0
     expenses = 0
+    paid_expenses = 0
 
     for future in futures:
         income += future.amount if future.kind.value == 'receivable' else 0
+        paid_income += future.paid if future.kind.value == 'receivable' else 0
         expenses += future.amount if future.kind.value == 'payable' else 0
+        paid_expenses += future.paid if future.kind.value == 'payable' else 0
 
         status = '■'
         if future.status.value == 'paid':
@@ -235,15 +240,26 @@ def see(
             status,
             future.due.strftime('%d %b %Y'),
             future.contact or '-',
-            f'{future.amount / 100 :,.2f}',
-            f'{future.paid / 100 :,.2f}',
-            f'{future.outstanding / 100 :,.2f}',
+            _format_money(future.amount),
+            _format_money(future.paid),
+            _format_money(future.outstanding),
             future.notes or '-',
             end_section=True
         )
 
-    console.print(table)
-    console.print(f'income: {income} expenses: {expenses / 100 :,.2f}')
+    totals = (
+        f'income [{_format_money(paid_income)} / {_format_money(income)}] /// '
+        f'expenses [{_format_money(paid_expenses)} / {_format_money(expenses)}]'
+    )
+
+    console.print(
+        Group(
+            table,
+            Align.center(totals)
+        ),
+        justify='center'
+    )
+
 
 @future_app.command('del')
 def delete(id: str) -> None:
@@ -258,3 +274,7 @@ def delete(id: str) -> None:
 
 def main():
     app()
+
+
+def _format_money(amount: int) -> str:
+    return f'{amount / 100 :,.2f}'
