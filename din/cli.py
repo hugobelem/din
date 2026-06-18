@@ -255,9 +255,9 @@ def see(
     console.print(
         Group(
             table,
-            Align.center(totals)
+            Align.left(totals)
         ),
-        justify='center'
+        justify='left'
     )
 
 
