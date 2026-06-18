@@ -118,7 +118,7 @@ def all():
         repo = f.FutureRepository(session)
         futures = repo.all()
 
-    table = Table(title="Futures", box=box.HORIZONTALS)
+    table = Table(title="Futures", box=box.SIMPLE)
 
     table.add_column("ID")
     table.add_column("Kind")
