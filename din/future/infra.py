@@ -1,6 +1,6 @@
 from uuid import uuid4, UUID
 
-from sqlalchemy import Date, Integer, String, Enum, select
+from sqlalchemy import Date, Integer, String, Enum, select, extract
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session
 
@@ -44,8 +44,20 @@ class FutureRepository:
 
         return [self._to_model(row) for row in rows]
     
+    def filter(self, month: int) -> list[f.Future]:
+        rows = self._session.scalars(select(FutureTable).where(
+            extract('month', FutureTable.due) == month
+        )).all()
+
+        return [self._to_model(row) for row in rows]
+    
     def delete(self, id: str) -> bool:
-        future = self._session.get(FutureTable, UUID(id))
+        try:
+            uuid = UUID(id)
+        except ValueError:
+            return False
+
+        future = self._session.get(FutureTable, uuid)
 
         if not future:
             return False
