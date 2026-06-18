@@ -83,7 +83,12 @@ class FutureRepository:
         return [self._to_model(row) for row in rows]
     
     def delete(self, id: str) -> bool:
-        future = self.get(id)
+        try:
+            uuid = UUID(id)
+        except ValueError:
+            return False
+
+        future = self._session.get(FutureTable, uuid)
 
         if not future:
             return False
