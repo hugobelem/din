@@ -1,6 +1,8 @@
 import typer
 
 from datetime import date
+from calendar import monthrange
+
 from din import settings, future as f
 
 from rich import box
@@ -20,28 +22,93 @@ def add(
     issued: str = typer.Option(date.today(), prompt='Issued date (YYYY-MM-DD)'),
     due: str = typer.Option(..., prompt='Due date (YYYY-MM-DD)'),
     amount: int = typer.Option(..., prompt=True),
-    recurrence: f.Recurrence = typer.Option('once', prompt=True),
     category: str = typer.Option(..., prompt=True),
     notes: str = typer.Option(..., prompt=True),
     contact: str = typer.Option(..., prompt=True),
+    recurrence: f.Recurrence = typer.Option('once', prompt=True),
 ) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
 
-        repo.save(
-            f.Future(
-                kind=kind,
-                issued=date.fromisoformat(issued),
-                due=date.fromisoformat(due),
-                status=f.Status.PENDING,
-                amount=amount,
-                paid=0,
-                recurrence=recurrence,
-                contact=contact,
-                category=category,
-                notes=notes,
-            )
+        due_date = date.fromisoformat(due)
+
+        future = f.Future(
+            kind=kind,
+            issued=date.fromisoformat(issued),
+            due=due_date,
+            status=f.Status.PENDING,
+            amount=amount,
+            paid=0,
+            recurrence=recurrence,
+            contact=contact,
+            category=category,
+            notes=notes,
         )
+
+        if recurrence == f.Recurrence.ONCE:
+            repo.save(future)
+
+        elif recurrence == f.Recurrence.MONTHLY:
+            while True:
+                try:
+                    due_day = int(input('Due day (1-31): '))
+                    if due_day > 0 and due_day < 32:
+                        break
+                except ValueError:
+                    typer.echo('Choose a number between 1 and 31')
+
+
+            year = due_date.year
+            month = due_date.month
+            original_day = due_day
+
+            ramaining_months = 12 - month or 1
+
+            for _ in range(ramaining_months + 1):
+                if month > 12: break
+                
+                last_day = monthrange(year, month)[1]
+                due_day = min(original_day, last_day)
+
+                future.due = date(year, month, due_day)
+                repo.save(future)
+
+                month += 1
+
+        elif recurrence == f.Recurrence.INSTALLMENTS:
+            installments = 0
+            try:
+                installments = int(input('Installments number: '))
+            except ValueError:
+                typer.echo('Choose a valid number')
+
+            while True:
+                try:
+                    due_day = int(input('Due day (1-31): '))
+                    if due_day > 0 and due_day < 32:
+                        break
+                except ValueError:
+                    typer.echo('Choose a number between 1 and 31')
+
+            year = due_date.year
+            month = due_date.month
+            original_day = due_day
+            count = 1
+            notes = f'{future.notes}'
+        
+            for _ in range(installments):
+                last_day = monthrange(year, month)[1]
+                due_day = min(original_day, last_day)
+
+                future.due = date(year, month, due_day)
+                future.notes = f'{notes} [{count}/{installments}]'
+                repo.save(future)
+
+                count += 1
+                month += 1
+                if month > 12:
+                    year += 1
+                    month = 1
 
     typer.echo('\nSaved ;)')
 
