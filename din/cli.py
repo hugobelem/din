@@ -14,10 +14,7 @@ from rich.align import Align
 app = typer.Typer()
 console = Console()
 
-future_app = typer.Typer()
-app.add_typer(future_app, name='future')
-
-@future_app.command()
+@app.command()
 def add(
     kind: f.Kind = typer.Option('payable', prompt=True),
     issued: str = typer.Option(date.today(), prompt='Issued date (YYYY-MM-DD)'),
@@ -113,7 +110,7 @@ def add(
 
     typer.echo('\nSaved ;)')
 
-@future_app.command()
+@app.command()
 def update(
     id: str,
     status: f.Status | None = typer.Option(None),
@@ -158,7 +155,7 @@ def update(
 
         repo.update(future)
 
-@future_app.command()
+@app.command()
 def all() -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
@@ -189,10 +186,10 @@ def all() -> None:
 
     console.print(table)
 
-@future_app.command()
+@app.command()
 def see(
-    month: int | None = None,
-    year: int | None = None,
+    month: int | None = typer.Option(None, '--month', '-m'),
+    year: int = typer.Option(date.today().year, '--year', '-y'),
     ) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
@@ -284,7 +281,7 @@ def see(
         justify='left'
     )
 
-@future_app.command()
+@app.command()
 def search(term: str) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
@@ -315,7 +312,7 @@ def search(term: str) -> None:
 
     console.print(table)
 
-@future_app.command('del')
+@app.command('del')
 def delete(id: str) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
