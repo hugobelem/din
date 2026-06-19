@@ -255,8 +255,10 @@ def see(
         )
 
     totals = (
-        f'income [{_format_money(paid_income)} / {_format_money(income)} → {_format_money(income_missing)}] /// '
-        f'expenses [{_format_money(paid_expenses)} / {_format_money(expenses)} → {_format_money(expenses_missing)}]'
+        f'income [{_format_money(paid_income)} / '
+        f'{_format_money(income)} → {_format_money(income_missing)}] /// '
+        f'expenses [{_format_money(paid_expenses)} / '
+        f'{_format_money(expenses)} → {_format_money(expenses_missing)}]'
     )
 
     console.print(
