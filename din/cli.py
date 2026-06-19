@@ -147,6 +147,9 @@ def update(
         if paid is not None:
             future.paid = paid
 
+        if future.outstanding == 0:
+            future.status = f.Status.PAID
+
         if due is not None:
             future.due = date.fromisoformat(due)
 
@@ -218,14 +221,18 @@ def see(
 
     income = 0
     paid_income = 0
+    income_missing = 0
     expenses = 0
     paid_expenses = 0
+    expenses_missing = 0
 
     for future in futures:
         income += future.amount if future.kind.value == 'receivable' else 0
         paid_income += future.paid if future.kind.value == 'receivable' else 0
+        income_missing += future.outstanding if future.kind.value == 'receivable' else 0
         expenses += future.amount if future.kind.value == 'payable' else 0
         paid_expenses += future.paid if future.kind.value == 'payable' else 0
+        expenses_missing += future.outstanding if future.kind.value == 'payable' else 0
 
         status = '■'
         if future.status.value == 'paid':
@@ -248,8 +255,8 @@ def see(
         )
 
     totals = (
-        f'income [{_format_money(paid_income)} / {_format_money(income)}] /// '
-        f'expenses [{_format_money(paid_expenses)} / {_format_money(expenses)}]'
+        f'income [{_format_money(paid_income)} / {_format_money(income)} → {_format_money(income_missing)}] /// '
+        f'expenses [{_format_money(paid_expenses)} / {_format_money(expenses)} → {_format_money(expenses_missing)}]'
     )
 
     console.print(
@@ -259,7 +266,6 @@ def see(
         ),
         justify='left'
     )
-
 
 @future_app.command('del')
 def delete(id: str) -> None:
@@ -274,7 +280,6 @@ def delete(id: str) -> None:
 
 def main():
     app()
-
 
 def _format_money(amount: int) -> str:
     return f'{amount / 100 :,.2f}'
