@@ -75,11 +75,24 @@ class FutureRepository:
 
         return [self._to_model(row) for row in rows]
     
-    def filter(self, month: int | None, year: int | None) -> list[f.Future]:
-        rows = self._session.scalars(select(FutureTable).where(
-            extract('year', FutureTable.due) == year,
-            extract('month', FutureTable.due) == month
-        ).order_by('due')).all()
+    def search(self, term: str) -> list[f.Future]:
+        rows = self._session.scalars(
+            select(FutureTable).where(
+                    (FutureTable.contact == term) |
+                    (FutureTable.amount == term) |
+                    (FutureTable.notes == term)
+            ).order_by('due')
+        ).all()
+
+        return [self._to_model(row) for row in rows]    
+    
+    def by_month(self, month: int | None, year: int | None) -> list[f.Future]:
+        rows = self._session.scalars(
+            select(FutureTable).where(
+                extract('year', FutureTable.due) == year,
+                extract('month', FutureTable.due) == month
+            ).order_by('due')
+        ).all()
 
         return [self._to_model(row) for row in rows]
     

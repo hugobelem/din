@@ -176,8 +176,6 @@ def all() -> None:
     table.add_column('Amount', justify='right')
     table.add_column('Paid', justify='right')
     table.add_column('Due')
-    table.add_column('Recurrence')
-    table.add_column('Category')
     table.add_column('notes')
 
     for future in futures:
@@ -189,8 +187,6 @@ def all() -> None:
             _format_money(future.amount),
             _format_money(future.paid),
             str(future.due),
-            future.recurrence.value,
-            future.category or '-',
             future.notes or '-'
         )
 
@@ -206,7 +202,7 @@ def see(
         futures = repo.all()
 
         if month:
-            futures = repo.filter(month, year)
+            futures = repo.by_month(month, year)
 
     table = Table(title='futures', box=box.SIMPLE)
 
@@ -268,6 +264,37 @@ def see(
         ),
         justify='left'
     )
+
+@future_app.command()
+def search(term: str) -> None:
+    with settings.Session() as session:
+        repo = f.FutureRepository(session)
+        results = repo.search(term)
+
+    table = Table(title='Futures', box=box.SIMPLE)
+
+    table.add_column('ID')
+    table.add_column('Kind')
+    table.add_column('Status')
+    table.add_column('Contact')
+    table.add_column('Amount', justify='right')
+    table.add_column('Paid', justify='right')
+    table.add_column('Due')
+    table.add_column('notes')
+
+    for r in results:
+        table.add_row(
+            str(r.id),
+            r.kind.value,
+            r.status.value,
+            r.contact or '-',
+            _format_money(r.amount),
+            _format_money(r.paid),
+            str(r.due),
+            r.notes or '-'
+        )
+
+    console.print(table)
 
 @future_app.command('del')
 def delete(id: str) -> None:
