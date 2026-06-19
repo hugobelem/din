@@ -1,6 +1,6 @@
 from uuid import uuid4, UUID
 
-from sqlalchemy import Date, Integer, String, Enum, select, extract, update
+from sqlalchemy import Date, Integer, String, Enum, select, extract, update, desc
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session
 
@@ -95,7 +95,7 @@ class FutureRepository:
             select(FutureTable).where(
                 extract('year', FutureTable.due) == year,
                 extract('month', FutureTable.due) == month
-            ).order_by('due')
+            ).order_by(FutureTable.due, desc(FutureTable.kind))
         ).all()
 
         return [self._to_model(row) for row in rows]
