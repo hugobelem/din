@@ -74,7 +74,7 @@ class FutureRepository:
 
         rows = self._session.scalars(
             select(FutureTable)
-            .order_by('due')
+            .order_by(FutureTable.due, desc(FutureTable.kind))
         ).all()
 
         return [self._to_model(row) for row in rows]
