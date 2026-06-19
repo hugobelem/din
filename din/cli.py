@@ -16,14 +16,14 @@ console = Console()
 
 @app.command()
 def add(
-    kind: f.Kind = typer.Option('payable', prompt=True),
-    issued: str = typer.Option(date.today(), prompt='Issued date (YYYY-MM-DD)'),
-    due: str = typer.Option(..., prompt='Due date (YYYY-MM-DD)'),
-    amount: int = typer.Option(..., prompt=True),
-    category: str = typer.Option(..., prompt=True),
-    notes: str = typer.Option(..., prompt=True),
-    contact: str = typer.Option(..., prompt=True),
-    recurrence: f.Recurrence = typer.Option('once', prompt=True),
+    kind: f.Kind = typer.Option('payable'),
+    issued: str = typer.Option(date.today()),
+    due: str = typer.Option(...),
+    amount: int = typer.Option(...),
+    category: str = typer.Option(...),
+    notes: str = typer.Option(...),
+    contact: str = typer.Option(...),
+    recurrence: f.Recurrence = typer.Option('once'),
 ) -> None:
     with settings.Session() as session:
         repo = f.FutureRepository(session)
