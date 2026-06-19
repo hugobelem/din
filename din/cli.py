@@ -210,6 +210,7 @@ def see(
     table.add_column('amount', justify='right')
     table.add_column('paid', justify='right')
     table.add_column('missing', justify='right')
+    table.add_column('balance', justify='right')
     table.add_column('notes')
 
     income = 0
@@ -218,40 +219,61 @@ def see(
     expenses = 0
     paid_expenses = 0
     expenses_missing = 0
+    balance = 0
 
     for future in futures:
-        income += future.amount if future.kind.value == 'receivable' else 0
-        paid_income += future.paid if future.kind.value == 'receivable' else 0
-        income_missing += future.outstanding if future.kind.value == 'receivable' else 0
-        expenses += future.amount if future.kind.value == 'payable' else 0
-        paid_expenses += future.paid if future.kind.value == 'payable' else 0
-        expenses_missing += future.outstanding if future.kind.value == 'payable' else 0
+        if future.kind.value == 'receivable':
+            income += future.amount
+            paid_income += future.paid
+            balance += future.amount
+            income_missing += future.outstanding
+        elif future.kind.value == 'payable':
+            expenses += future.amount
+            paid_expenses += future.paid
+            balance -= future.amount
+            expenses_missing += future.outstanding
 
         status = '■'
         if future.status.value == 'paid':
             status = f'[green]■[/green]'
-        if future.status.value == 'overdue':
+        elif future.status.value == 'overdue':
             status = f'[red]■[/red]'
-        if future.status.value == 'partial':
-            status = f'[orange]■[/orange]'
+        elif future.status.value == 'partial':
+            status = f'[yellow]■[/yellow]'
+
+        format_balance = _format_money(balance)
+        if balance < 0:
+            format_balance = f'[red]{_format_money(balance)}[/red]'
+        elif balance > 0 and balance < 100000:
+            format_balance = f'[yellow]{_format_money(balance)}[/yellow]'
+        elif balance > 0 and balance >= 100000:
+            format_balance = f'[green]{_format_money(balance)}[/green]'
+
+        kind = '[bold][red]-[/red][/bold]' \
+                if future.kind.value == 'payable' \
+                else '[bold][green]+[/green][/bold]'
 
         table.add_row(
-            '-' if future.kind.value == 'payable' else '+',
+            kind,
             status,
             future.due.strftime('%d %b %Y'),
             future.contact or '-',
             _format_money(future.amount),
             _format_money(future.paid),
             _format_money(future.outstanding),
+            format_balance,
             future.notes or '-',
             end_section=True
         )
+
+    total_balance = income - expenses
 
     totals = (
         f'income [{_format_money(paid_income)} / '
         f'{_format_money(income)} → {_format_money(income_missing)}] /// '
         f'expenses [{_format_money(paid_expenses)} / '
-        f'{_format_money(expenses)} → {_format_money(expenses_missing)}]'
+        f'{_format_money(expenses)} → {_format_money(expenses_missing)}] /// '
+        f'balance {_format_money(total_balance)}'
     )
 
     console.print(
