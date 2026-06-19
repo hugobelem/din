@@ -40,6 +40,8 @@ class Future:
     def outstanding(self) -> int:
         return self.amount - self.paid
     
-    @property
-    def is_overdue(self) -> bool:
-        return self.due < date.today()
+    def __post_init__(self) -> None:
+        if self.due < date.today() and self.status == Status.PENDING:
+            self.status = Status.OVERDUE
+        if self.outstanding == 0:
+            self.status = Status.PAID

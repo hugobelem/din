@@ -147,9 +147,6 @@ def update(
         if paid is not None:
             future.paid = paid
 
-        if future.outstanding == 0:
-            future.status = f.Status.PAID
-
         if due is not None:
             future.due = date.fromisoformat(due)
 
