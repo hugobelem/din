@@ -71,7 +71,11 @@ class FutureRepository:
         self._session.commit()
 
     def all(self) -> list[f.Future]:
-        rows = self._session.scalars(select(FutureTable).order_by('due')).all()
+
+        rows = self._session.scalars(
+            select(FutureTable)
+            .order_by('due')
+        ).all()
 
         return [self._to_model(row) for row in rows]
     
