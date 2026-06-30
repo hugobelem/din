@@ -43,5 +43,10 @@ class Future:
     def __post_init__(self) -> None:
         if self.due < date.today() and self.status == Status.PENDING:
             self.status = Status.OVERDUE
+
         if self.outstanding == 0:
             self.status = Status.PAID
+        elif self.paid > 0 and self.paid < self.amount:
+            self.status = Status.PARTIAL
+        else:
+            self.status = Status.PENDING
